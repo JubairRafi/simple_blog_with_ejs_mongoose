@@ -12,14 +12,13 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 
 const app = express();
 
-let posts=[];
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/blogDB",{useNewUrlParser:true});
+mongoose.connect("mongodb://localhost:27017/blogDB",{useNewUrlParser:true,useUnifiedTopology: true});
 
     const postSchema = new mongoose.Schema({
       postTitle:String,
@@ -27,16 +26,13 @@ mongoose.connect("mongodb://localhost:27017/blogDB",{useNewUrlParser:true});
     });
 
 const Post = mongoose.model("Post",postSchema);
-const item = new Post({
-  title:"test",
-  content:"test"
-});
-item.save();
 
 app.get("/",(req,res)=>{
-  res.render("home" ,{StartingContent:homeStartingContent, newPost: posts});
-
+      Post.find({},(err,foundPosts)=>{
+      res.render("home" ,{StartingContent:homeStartingContent, newPost: foundPosts});
+  });
 });
+
 
 app.get("/about",(req,res)=>{
   res.render("about" ,{aboutContent:aboutContent});
@@ -53,16 +49,21 @@ app.get("/compose",(req,res)=>{
 
 app.get("/posts/:postName",(req,res)=>{
   const requestedTitle = _.lowerCase(req.params.postName);
-  posts.forEach((post)=>{
-    const storedTitle = _.lowerCase(post.title);
-    if (storedTitle===requestedTitle) {
+  // Post.find({},(err,foundPosts)=>{
+  //   foundPosts.forEach((singlePost)=>{
+  //     if (_.lowerCase(singlePost.postTitle)===requestedTitle) {
+  //       res.render("post", {separateTitle:singlePost.postTitle,separateContent:singlePost.content});
+  //     }
+  //   });
+  // });
 
-      res.render("post", {separateTitle:post.title,separateContent:post.content});
-
+  Post.findOne({postTitle:requestedTitle},(err,foundPost)=>{ //same code ass above
+    if (err) {
+      console.log(err);
+    } else {
+        res.render("post", {separateTitle:foundPost.postTitle,separateContent:foundPost.content});
     }
-  });
-
-
+  })
 });
 
 
@@ -70,12 +71,22 @@ app.post("/compose",(req,res)=>{
   let title = req.body.postTitle;
   let postbody = req.body.postBody;
 
- const post ={
-    title : title,
-    content : postbody
-  };
-  posts.push(post);
-  res.redirect("/");
+ // const post ={
+ //    title : title,
+ //    content : postbody
+ //  };
+
+  const composePost = new Post({
+    postTitle: title,
+    content: postbody
+  });
+  composePost.save((err)=>{
+    if(!err){
+      res.redirect("/");
+    }
+  });
+
+
 });
 
 

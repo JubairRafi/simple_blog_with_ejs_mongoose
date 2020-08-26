@@ -4,8 +4,8 @@
 <p> <%= StartingContent %></p>
 
 <%  newPost.forEach((pp)=>{ %>
-  <h2><%=pp.title %></h2>
-  <p> <%= pp.content.substring(0,100)+" .." %><a href="/posts/<%=pp.title %>">Read more</a></p>
+  <h2><%=pp.postTitle %></h2>
+  <p> <%= pp.content.substring(0,100)+" .." %><a href="/posts/<%=pp.postTitle %>">Read more</a></p>
 
 
 <% });  %>
