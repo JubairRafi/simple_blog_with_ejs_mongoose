@@ -47,8 +47,8 @@ app.get("/compose",(req,res)=>{
   res.render("compose");
 });
 
-app.get("/posts/:postName",(req,res)=>{
-  const requestedTitle = _.lowerCase(req.params.postName);
+app.get("/posts/:postId",(req,res)=>{
+  const requestedTitleID = req.params.postId;
   // Post.find({},(err,foundPosts)=>{
   //   foundPosts.forEach((singlePost)=>{
   //     if (_.lowerCase(singlePost.postTitle)===requestedTitle) {
@@ -57,7 +57,7 @@ app.get("/posts/:postName",(req,res)=>{
   //   });
   // });
 
-  Post.findOne({postTitle:requestedTitle},(err,foundPost)=>{ //same code ass above
+  Post.findOne({_id:requestedTitleID},(err,foundPost)=>{ //same code ass above but with Id
     if (err) {
       console.log(err);
     } else {
